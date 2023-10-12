@@ -10,6 +10,8 @@ defmodule E4vm do
   alias Structure.Stack
   alias E4vm.CoreWord
 
+  @alu_bit_width 16
+
   defstruct [
     rs: Stack.new(), # Стек возвратов
     ds: Stack.new(), # Стек данных
@@ -19,11 +21,16 @@ defmodule E4vm do
     core: [],        # Base instructions
     # entries: [],     # Core Word header dictionary
     hereP: 0,        # Here pointer указатель на адрес, где будет следующее слово
+    cell_bit_size: @alu_bit_width, # cell - 16 bit
+    is_eval_mode: true,
   ]
 
   def new() do
     %E4vm{}
       |> E4vm.Words.Core.add_core_words()
+      |> E4vm.Words.Stack.add_core_words()
+      |> E4vm.Words.Math.add_core_words()
+      |> E4vm.Words.Boolean.add_core_words()
   end
 
   def do_list(vm), do: E4vm.Words.Core.do_list(vm)

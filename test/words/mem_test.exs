@@ -10,8 +10,8 @@ defmodule E4vm.Words.MemTest do
       |> E4vm.add_op_from_string("exit")
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(555)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # в памяти по адресу 555 должна быть записана 1
@@ -32,8 +32,8 @@ defmodule E4vm.Words.MemTest do
     # и поместим в стек адрес - 555 чтобы считать значение
     vm = vm
       |> E4vm.Utils.ds_push(555)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # в стеке адрес 555 должен замениться на значение из этой ячейки - 444

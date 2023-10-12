@@ -48,8 +48,8 @@ defmodule E4vm.Words.CoreTest do
 
     %E4vm{vm | ip: 0, wp: vm.hereP - 3}
       # |> IO.inspect(label: ">>>> vm")
-      |> E4vm.Words.Core.do_list() # выполняем команду начала интерпретации слова, сохраняя IP = 0 на стеке возвратов
-      |> E4vm.Words.Core.next()    # запускаем адресный интерпретатор
+      |> E4vm.do_list() # выполняем команду начала интерпретации слова, сохраняя IP = 0 на стеке возвратов
+      |> E4vm.next()    # запускаем адресный интерпретатор
 
     assert_receive :hello
   end
@@ -65,8 +65,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("hello2")
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> IO.inspect(label: ">>>> vm")
 
     assert_receive :hello
@@ -97,8 +97,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
       # |> IO.inspect(label: ">>>> vm")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
 
     assert_receive :hello
   end
@@ -110,8 +110,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("doLit")
       |> E4vm.add_op(555)
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> IO.inspect(label: ">>>> vm")
 
     assert "#Stack<[555]>" == inspect(vm.ds)
@@ -137,8 +137,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("hello2")
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> IO.inspect(label: ">>>> vm")
 
     refute_receive :hello
@@ -149,8 +149,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("hello2")
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> IO.inspect(label: ">>>> vm")
 
     assert_receive :hello
@@ -180,8 +180,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> IO.inspect(label: ">>>> vm")
 
     refute_receive :hello
@@ -210,8 +210,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("nop")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     assert_receive :hello
@@ -224,8 +224,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("doList")
       |> E4vm.add_op_from_string("here")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     top_ds = vm |> E4vm.Utils.ds_pop()
@@ -238,8 +238,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("doList")
       |> E4vm.add_op_from_string("words")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
   end
 
   test "test dump" do
@@ -251,8 +251,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("here")
       |> E4vm.add_op_from_string("dump")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
   end
 
   test "test [ ]" do
@@ -261,8 +261,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("doList")
       |> E4vm.add_op_from_string("]")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
 
       assert vm.is_eval_mode == false
   end
@@ -278,8 +278,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("exit")
 
     vm = vm
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
 
     assert vm.mem[vm.hereP - 1] == 0
   end
@@ -297,8 +297,8 @@ defmodule E4vm.Words.CoreTest do
       |> E4vm.add_op_from_string("doList")
       |> E4vm.add_op_from_string("immediate")
       |> E4vm.add_op_from_string("exit")
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
 
     assert {"hello2", {{CoreTest, :hello}, true, _}} = hd(vm.entries)
   end
@@ -326,8 +326,8 @@ defmodule E4vm.Words.CoreTest do
     old_here = vm.hereP
 
     vm = vm
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     assert vm.is_eval_mode == true
@@ -383,8 +383,8 @@ defmodule E4vm.Words.CoreTest do
     # |> E4vm.add_header("hui2")
     # |> E4vm.add_op(0)
     # |> E4vm.inspect_core()
-    |> E4vm.Words.Core.do_list()
-    |> E4vm.Words.Core.next()
+    |> E4vm.do_list()
+    |> E4vm.next()
     # |> E4vm.inspect_core()
   end
 
@@ -402,8 +402,8 @@ defmodule E4vm.Words.CoreTest do
     vm
       |> E4vm.Utils.ds_push(E4vm.look_up_word_address(vm, "hello2"))
       # |> E4vm.inspect_core()
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
 
     assert_receive :hello
   end
@@ -520,8 +520,8 @@ defmodule E4vm.Words.CoreTest do
     |> E4vm.add_op_from_string("doList")
     |> E4vm.add_op_from_string("'")
     |> E4vm.add_op_from_string("exit")
-    |> E4vm.Words.Core.do_list()
-    |> E4vm.Words.Core.next()
+    |> E4vm.do_list()
+    |> E4vm.next()
     # |> E4vm.inspect_core()
 
     # должно считать из входного потока слово nop и поместить его адрес(0) в стек ds

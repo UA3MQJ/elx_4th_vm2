@@ -10,8 +10,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.add_op_from_string("exit")
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(2)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # [2, 1] -> [1]
@@ -28,8 +28,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.add_op_from_string("exit")
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(2)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # [2, 1] -> [1, 2]
@@ -44,8 +44,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.add_op_from_string("dup")
       |> E4vm.add_op_from_string("exit")
       |> E4vm.Utils.ds_push(1)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # [1] -> [1, 1]
@@ -62,8 +62,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.add_op_from_string("exit")
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(2)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     # [1, 2] -> [1, 2, 1]
@@ -80,8 +80,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(2)
       |> E4vm.Utils.ds_push(3)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     assert "#Stack<[2, 3, 1]>" == inspect(vm.ds)
@@ -97,8 +97,8 @@ defmodule E4vm.Words.StackTest do
       |> E4vm.Utils.ds_push(1)
       |> E4vm.Utils.ds_push(2)
       |> E4vm.Utils.ds_push(3)
-      |> E4vm.Words.Core.do_list()
-      |> E4vm.Words.Core.next()
+      |> E4vm.do_list()
+      |> E4vm.next()
       # |> E4vm.inspect_core()
 
     assert "#Stack<[3, 1, 2]>" == inspect(vm.ds)

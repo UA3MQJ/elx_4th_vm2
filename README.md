@@ -146,5 +146,28 @@ E4vm.add_core_word("hello2",  __MODULE__, :hello,   false)
   end
 
 ```
+1.3 операции над элементами стека, математические, логические
+
+Это вот те операции, для реализации которых ничего не надо. То есть они берут данные на стеке, что-то с ними делают и кладут обратно. Их можно реализовать, имея только текущий функционал. Даже помещать данные на стек уметь не надо.
+
+Это операции
+
+Stack: `drop swap dup over rot nrot`
+
+Math: `- + * / mod 1+ 1-`
+
+Boolean: `true false and or xor not invert = <> < > <= >=`
+
+в ядро пришлось добавить `cell_bit_size: @alu_bit_width` ширину АЛУ для определенной разрядности логических слов. и на будущее флаг `is_eval_mode: true`
 
 
+# Поддежка слов
+
+- [x] Core: `nop next doList exit`
+- [ ] Ext Core: `nop quit doLit here [ ] , immediate execute : ; branch 0branch dump words '`
+- [ ] Mem: `! @ variable constant`
+- [x] Stack: `drop swap dup over rot nrot`
+- [x] Math: `- + * / mod 1+ 1-`
+- [x] Boolean: `true false and or xor not invert = <> < > <= >=`
+- [ ] Comment: `( \\`
+- [ ] RW: `. .s cr bl word s" key` TODO: `word s"`
