@@ -6,7 +6,6 @@ defmodule E4vm.Test do
 
     E4vm.new()
       # добавляем слова
-      |> E4vm.add_core_word("nop",  __MODULE__, :nop,   false)
       |> E4vm.add_core_word("hello",  __MODULE__, :hello,   false)
       # hereP -> wp - с этого места будет начинаться прогамма
       |> E4vm.here_to_wp()
