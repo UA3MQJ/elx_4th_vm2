@@ -1,10 +1,14 @@
 defmodule E4vm do
+  defmodule CoreWord do
+    defstruct [:word, :module, :function, :address, :immediate, :enabled]
+  end
   @moduledoc """
   Documentation for `E4vm`.
   ds word size - 16 bit
   """
   require Logger
   alias Structure.Stack
+  alias E4vm.CoreWord
 
   defstruct [
     rs: Stack.new(), # Стек возвратов
@@ -12,37 +16,93 @@ defmodule E4vm do
     ip: 0,           # Указатель инструкций
     wp: 0,           # Указатель слова
     mem: %{},        # память программ
-    core: %{},       # Base instructions
-    entries: [],     # Core Word header dictionary
-    hereP: 0,        # Here pointer
+    core: [],        # Base instructions
+    # entries: [],     # Core Word header dictionary
+    hereP: 0,        # Here pointer указатель на адрес, где будет следующее слово
   ]
 
   def new() do
     %E4vm{}
+      |> E4vm.Words.Core.add_core_words()
   end
 
-  # Суть интерпретации заключается в переходе
-  # по адресу в памяти и в исполнении инструкции,
-  # которая там указана.
-  # Останавливаемся, если адрес 0
-  def next(%E4vm{ip: 0} = vm), do: vm
-  def next(vm) do
-    # выбираем адрес следующей инструкции
-    next_wp = vm.mem[vm.ip]
-    # увеличиваем указатель инструкций
-    next_ip = vm.ip + 1
-    new_vm = %E4vm{vm | ip: next_ip, wp: next_wp}
+  def do_list(vm), do: E4vm.Words.Core.do_list(vm)
+  def next(vm), do: E4vm.Words.Core.next(vm)
+  def exit(vm), do: E4vm.Words.Core.exit(vm)
 
-    # по адресу следующего указателя на слово
-    # выбираем адрес инструкции из памяти
-    # и по адресу определяем команду с помощью хранилища примитовов
-    {m, f} = vm.core[new_vm.mem[next_wp]]
+  # функция добавления слово в словарь базовых:
+  def add_core_word(%E4vm{} = vm, word, module, function, immediate) do
+    word_address = vm.hereP
+    core_word = %CoreWord{
+      word: word,
+      module: module,
+      function: function,
+      address: word_address,
+      immediate: immediate,
+      enabled: true # by default
+    }
 
-    # выполняем эту команду
-    next_new_vm = apply(m, f, [new_vm])
-
-    # повторяем цикл
-    next(next_new_vm)
+    vm
+    |> Map.merge(%{core: [core_word] ++ vm.core})
+    |> add_address_to_mem(word_address)
+    |> inc_here() # hereP++
   end
 
+  # всякий синтаксический сахар
+
+  # hereP++
+  def inc_here(%E4vm{} = vm),
+    do: %E4vm{vm| hereP: vm.hereP + 1}
+
+  # занести в адрес 1 -> 1
+  def add_address_to_mem(%E4vm{} = vm, address) do
+    new_mem = Map.merge(vm.mem, %{address => address})
+    %E4vm{vm| mem: new_mem}
+  end
+
+  # сохранить текущее here в wp чтобы это место считать стартовым для программы
+  def here_to_wp(vm) do
+    # "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>>>>>>>>> here->wp")
+    %E4vm{vm | wp: vm.hereP}
+  end
+
+  # это больше нужно для pipe'ов потому что вложенную фунцию в пайпе не вызвать с входными данными (или можно?)
+  # поместить в память адрес слова, найденного по строке
+  def add_op_from_string(%E4vm{} = vm, word_string) do
+    addr = look_up_word_address(vm, word_string)
+    new_mem = Map.merge(vm.mem, %{vm.hereP => addr})
+    %E4vm{vm| hereP: vm.hereP + 1, mem: new_mem}
+  end
+
+  # добавляем операцию в память. то есть в память по адресу hereP кладем переданный адрес слова
+  def add_op(%E4vm{} = vm, addr) do
+    new_mem = Map.merge(vm.mem, %{vm.hereP => addr})
+    %E4vm{vm| hereP: vm.hereP + 1, mem: new_mem}
+  end
+
+  # поиск адреса слова
+  def look_up_word_address(vm, word_string) do
+    case look_up_word_by_string(vm, word_string) do
+      %CoreWord{address: address} -> address
+      _else -> :undefined
+    end
+  end
+
+  # поиск слова по строке
+  def look_up_word_by_string(%E4vm{core: core} = _vm, word_string) do
+    result = Enum.find(core, fn word -> word.word == word_string end)
+    case result do
+      %CoreWord{} = core_word -> core_word
+      _else -> :undefined
+    end
+  end
+
+  # поиск слова по адресу
+  def look_up_word_by_address(%E4vm{core: core} = _vm, word_address) do
+    result = Enum.find(core, fn word -> word.address == word_address end)
+    case result do
+      %CoreWord{} = core_word -> core_word
+      _else -> :undefined
+    end
+  end
 end
