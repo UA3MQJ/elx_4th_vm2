@@ -1,6 +1,8 @@
 defmodule E4vm.Test do
   use ExUnit.Case
 
+  # тестируется минимальная работоспособность ядра вм и минимально 3 слова в core
+
   test "step 1.2 simple start test" do
     Process.register(self(), :test_proc)
 

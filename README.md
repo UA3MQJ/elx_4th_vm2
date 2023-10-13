@@ -163,14 +163,29 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 в ядро пришлось добавить `cell_bit_size: @alu_bit_width` ширину АЛУ для определенной разрядности логических слов. и на будущее флаг `is_eval_mode: true`
 
+1.4 добавим еще несколько слов в core_ext
+
+Добавлю еще склова в Core, но чтобы не усложнять базовый Core сделаю CoreExt. Слова которые не требуют реализации и понимания доп возможностей от ядра
+
+Это слова:
+ * `quit` для выхода;
+ * `doLit` помещение константы в стек;
+ * `here` помещение адреса hereP в стек;
+ * `,` (comma) Reserve data space for one cell and store w in the space - просто положит в ячейку по адресу hereP число из стека;
+ * `branch` переход по адресу в следующей ячейке
+ * `0branch` zbranch переход по адресу, если в след ячейке 0. то есть false (false - это все биты в ноле. true - это все биты одной ячейки(cell) в единице.)
+ * `dump` - вывод содержимого памяти
+ * `words` - вывод списка определенных слов
+
+
 
 # Поддежка слов
 
 - [x] Core: `nop next doList exit`
-- [ ] Ext Core: `nop quit doLit here [ ] , immediate execute : ; branch 0branch dump words '`
-- [ ] Mem: `! @ variable constant`
+- [ ] Ext Core: `quit doLit here , branch 0branch dump words` TODO: `[ ] immediate execute : ; '`
+- [ ] Mem: `! @ variable constant` TODO: `! @ variable constant`
 - [x] Stack: `drop swap dup over rot nrot`
-- [x] Math: `- + * / mod 1+ 1-`
+- [x] Math: `- + * / mod 1+ 1-` TODO: тесты по eval
 - [x] Boolean: `true false and or xor not invert = <> < > <= >=`
 - [ ] Comment: `( \\`
-- [ ] RW: `. .s cr bl word s" key` TODO: `word s"`
+- [ ] RW: `. .s cr bl word s" key`

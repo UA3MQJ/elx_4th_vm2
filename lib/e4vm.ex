@@ -28,6 +28,7 @@ defmodule E4vm do
   def new() do
     %E4vm{}
       |> E4vm.Words.Core.add_core_words()
+      |> E4vm.Words.CoreExt.add_core_words()
       |> E4vm.Words.Stack.add_core_words()
       |> E4vm.Words.Math.add_core_words()
       |> E4vm.Words.Boolean.add_core_words()
