@@ -170,6 +170,31 @@ defmodule E4vm.Words.CoreExtTest do
       |> E4vm.Words.Core.next()
   end
 
+  test "test ]" do
+    vm = E4vm.new()
+      |> E4vm.here_to_wp()
+      |> E4vm.add_op_from_string("doList")
+      |> E4vm.add_op_from_string("]")
+      |> E4vm.add_op_from_string("exit")
+      |> E4vm.Words.Core.do_list()
+      |> E4vm.Words.Core.next()
+
+      assert vm.is_eval_mode == false
+  end
+
+  test "test ] [" do
+    vm = E4vm.new()
+      |> E4vm.here_to_wp()
+      |> E4vm.add_op_from_string("doList")
+      |> E4vm.add_op_from_string("]")
+      |> E4vm.add_op_from_string("[")
+      |> E4vm.add_op_from_string("exit")
+      |> E4vm.Words.Core.do_list()
+      |> E4vm.Words.Core.next()
+
+      assert vm.is_eval_mode == true
+  end
+
   def hello(vm) do
     "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>TEST>>>> hello  ")
 

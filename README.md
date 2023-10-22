@@ -177,12 +177,12 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
  * `dump` - вывод содержимого памяти
  * `words` - вывод списка определенных слов
 
-
+1.5 добавим слова `[ ]` они меняют свойство ядра `is_eval_mode` при этом, слово `[` добавляется с `immediate==true` что это дает - пока не понятно.
 
 # Поддежка слов
 
 - [x] Core: `nop next doList exit`
-- [ ] Ext Core: `quit doLit here , branch 0branch dump words` TODO: `[ ] immediate execute : ; '`
+- [ ] Ext Core: `quit doLit here , branch 0branch dump words [ ]` TODO: `immediate execute : ; '`
 - [ ] Mem: `! @ variable constant` TODO: `! @ variable constant`
 - [x] Stack: `drop swap dup over rot nrot`
 - [x] Math: `- + * / mod 1+ 1-` TODO: тесты по eval

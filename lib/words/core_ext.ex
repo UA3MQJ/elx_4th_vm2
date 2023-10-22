@@ -11,6 +11,8 @@ defmodule E4vm.Words.CoreExt do
     |> E4vm.add_core_word("0branch",    __MODULE__, :zbranch,        false)
     |> E4vm.add_core_word("dump",       __MODULE__, :dump,           false)
     |> E4vm.add_core_word("words",      __MODULE__, :words,          false)
+    |> E4vm.add_core_word("[",          __MODULE__, :lbrac,          true)
+    |> E4vm.add_core_word("]",          __MODULE__, :rbrac,          false)
   end
 
   def quit(_vm) do
@@ -135,4 +137,15 @@ defmodule E4vm.Words.CoreExt do
     vm
   end
 
+  # войти в eval режим - eval = true
+  def lbrac(vm) do
+    # "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>>>>>>>>> lbrac   ")
+    %E4vm{vm | is_eval_mode: true}
+  end
+
+  # выйти из eval режима - eval = false
+  def rbrac(vm) do
+    # "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>>>>>>>>> rbrac   ")
+    %E4vm{vm | is_eval_mode: false}
+  end
 end
