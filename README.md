@@ -183,7 +183,7 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 - [x] Core: `nop next doList exit`
 - [ ] Ext Core: `quit doLit here , branch 0branch dump words [ ]` TODO: `immediate execute : ; '`
-- [ ] Mem: `! @ variable constant` TODO: `! @ variable constant`
+- [x] Mem: `! @ variable constant`
 - [x] Stack: `drop swap dup over rot nrot`
 - [x] Math: `- + * / mod 1+ 1-` TODO: тесты по eval
 - [x] Boolean: `true false and or xor not invert = <> < > <= >=`
