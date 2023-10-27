@@ -23,6 +23,9 @@ defmodule E4vm do
     hereP: 0,        # Here pointer указатель на адрес, где будет следующее слово
     cell_bit_size: @alu_bit_width, # cell - 16 bit
     is_eval_mode: true,
+    # channel options
+    read_char_mfa: nil,        # {m,f}
+    read_char_state: nil,
   ]
 
   def new() do
@@ -32,6 +35,7 @@ defmodule E4vm do
       |> E4vm.Words.Stack.add_core_words()
       |> E4vm.Words.Math.add_core_words()
       |> E4vm.Words.Boolean.add_core_words()
+      |> E4vm.Words.Comment.add_core_words()
   end
 
   def do_list(vm), do: E4vm.Words.Core.do_list(vm)
@@ -111,6 +115,63 @@ defmodule E4vm do
     case result do
       %CoreWord{} = core_word -> core_word
       _else -> :undefined
+    end
+  end
+
+  # берет mfa и выполняет. переключаемая логика.
+  # read_char_mfa модуль функция, которой передается vm. возврат {new_vm, char}
+  # read_char_state использовать для стейта функции чтения. любые данные.
+  def read_char(%E4vm{} = vm) do
+    {m, f} = vm.read_char_mfa
+    {_next_read_char_state, _char} = apply(m, f, [vm.read_char_state])
+  end
+
+  def read_string_char_function(read_char_state) do
+    case string_char_reader(read_char_state) do
+      {:end, _} ->
+        {read_char_state, :end}
+      {char, next_char_state} ->
+        {next_char_state, char}
+    end
+  end
+
+  def string_char_reader(state) do
+    if String.length(state) > 0 do
+      <<char>> <> next_state = state
+      {<<char>>, next_state} # char это строка, но длиной 1 символ!
+    else
+      {:end, state}
+    end
+  end
+
+  def read_word(%E4vm{} = vm) do
+    {_next_vm, _word} = do_read_word("", vm)
+  end
+
+  def do_read_word(word, vm) do
+    case read_char(vm) do
+      {next_char_state, :end} ->
+        next_vm = %{vm| read_char_state: next_char_state}
+        if word == "" do
+          {next_vm, :end}
+        # иначе возвращаем слово
+        else
+          {next_vm, word}
+        end
+      {next_char_state, char} ->
+        next_vm = %{vm| read_char_state: next_char_state}
+        if char in [" ", "\n", "\r", "\t"] do
+          # если пусто, то еще ничего на считали и продолждаем
+          if word == "" do
+            do_read_word(word, next_vm)
+          # иначе возвращаем слово
+          else
+            {vm, word} # vm, а не next_vm - не выкидываем пробел
+          end
+        else
+          # если символ не пробельный - добавляем
+          do_read_word(word <> char, next_vm)
+        end
     end
   end
 end

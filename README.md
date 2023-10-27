@@ -179,6 +179,81 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 1.5 добавим слова `[ ]` они меняют свойство ядра `is_eval_mode` при этом, слово `[` добавляется с `immediate==true` что это дает - пока не понятно.
 
+1.6* Похоже, дальше нужно реализовать слова, которые будут читать введенный поток. Для этого реализуем read_char. Чтение одного символа. В свойствах ядра задам две переменные: одна `read_char_mfa: nil, # {m,f}` модуль и функция, которая будет отдавать очередной символ. А вторая переменная `read_char_state: nil,` это состояние (буфер, итд). 
+
+```
+  # берет mfa и выполняет. переключаемая логика.
+  # read_char_mfa модуль функция, которой передается vm. возврат {new_vm, char}
+  # read_char_state использовать для стейта функции чтения. любые данные.
+  def read_char(%E4vm{} = vm) do
+    {m, f} = vm.read_char_mfa
+    {_next_read_char_state, _char} = apply(m, f, [vm.read_char_state])
+  end
+```
+
+возвращать должно или символ и новый стейт {next_char_state, char} или конец {next_char_state, :end}.
+
+Базовая функция, получения из строки "abcd" таких данных:
+
+```
+  def read_string_char_function(read_char_state) do
+    case string_char_reader(read_char_state) do
+      {:end, _} ->
+        {read_char_state, :end}
+      {char, next_char_state} ->
+        {next_char_state, char}
+    end
+  end
+
+  def string_char_reader(state) do
+    if String.length(state) > 0 do
+      <<char>> <> next_state = state
+      {<<char>>, next_state} # char это строка, но длиной 1 символ!
+    else
+      {:end, state}
+    end
+  end
+```
+
+и из `read_char` можно сделать абстрактный `read_word`
+
+```
+  def read_word(%E4vm{} = vm) do
+    {_next_vm, _word} = do_read_word("", vm)
+  end
+
+  def do_read_word(word, vm) do
+    case read_char(vm) do
+      {next_char_state, :end} ->
+        next_vm = %{vm| read_char_state: next_char_state}
+        if word == "" do
+          {next_vm, :end}
+        # иначе возвращаем слово
+        else
+          {next_vm, word}
+        end
+      {next_char_state, char} ->
+        next_vm = %{vm| read_char_state: next_char_state}
+        if char in [" ", "\n", "\r", "\t"] do
+          # если пусто, то еще ничего на считали и продолждаем
+          if word == "" do
+            do_read_word(word, next_vm)
+          # иначе возвращаем слово
+          else
+            {vm, word} # vm, а не next_vm - не выкидываем пробел
+          end
+        else
+          # если символ не пробельный - добавляем
+          do_read_word(word <> char, next_vm)
+        end
+    end
+  end
+```
+
+После этого можно делать слова, использующие `read_char`: например Comment. НО, блин, протестить никак потому что проверка через `EVAL`. Сбой линейной последовательности.
+
+
+
 # Поддежка слов
 
 - [x] Core: `nop next doList exit`
