@@ -252,12 +252,28 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 После этого можно делать слова, использующие `read_char`: например Comment. НО, блин, протестить никак потому что проверка через `EVAL`. Сбой линейной последовательности.
 
+1.7 В принципе, можно с тем, что уже есть, реализовать слова `immediate` -не особо понимая и `execute` в принципе понятно. `Immediate` при выполнении меняет флаг `immediate` у последнего определенного слова на `true`. А `execute` - выполнить слово по адресу со стека ds - стек данных. Выполнить мы вроде бы тоже как можем.
+
+```
+  # делаем последнее определенное слово immediate = true
+  def immediate(vm) do
+    [last_word|tail] = vm.core
+
+    new_core = [%CoreWord{last_word | immediate: true}] ++ tail
+
+    %E4vm{vm | core: new_core}
+  end
+```
+выполнение слова
+```
+
+```
 
 
 # Поддежка слов
 
 - [x] Core: `nop next doList exit`
-- [ ] Ext Core: `quit doLit here , branch 0branch dump words [ ]` TODO: `immediate execute : ; '`
+- [ ] Ext Core: `quit doLit here , branch 0branch dump words [ ] immediate execute` TODO: `: ; '`
 - [x] Mem: `! @ variable constant`
 - [x] Stack: `drop swap dup over rot nrot`
 - [x] Math: `- + * / mod 1+ 1-` TODO: тесты по eval

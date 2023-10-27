@@ -1,5 +1,6 @@
 defmodule E4vm.Words.CoreExt do
   alias Structure.Stack
+  alias E4vm.CoreWord
 
   def add_core_words(%E4vm{} = vm) do
     vm
@@ -13,6 +14,8 @@ defmodule E4vm.Words.CoreExt do
     |> E4vm.add_core_word("words",      __MODULE__, :words,          false)
     |> E4vm.add_core_word("[",          __MODULE__, :lbrac,          true)
     |> E4vm.add_core_word("]",          __MODULE__, :rbrac,          false)
+    |> E4vm.add_core_word("immediate",  __MODULE__, :immediate,      true)
+    |> E4vm.add_core_word("execute",    __MODULE__, :execute,        false)
   end
 
   def quit(_vm) do
@@ -147,5 +150,35 @@ defmodule E4vm.Words.CoreExt do
   def rbrac(vm) do
     # "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>>>>>>>>> rbrac   ")
     %E4vm{vm | is_eval_mode: false}
+  end
+
+  # делаем последнее определенное слово immediate = true
+  def immediate(vm) do
+    [last_word|tail] = vm.core
+
+    new_core = [%CoreWord{last_word | immediate: true}] ++ tail
+
+    %E4vm{vm | core: new_core}
+  end
+
+  # выполнить слово по адресу со стека ds - стек данных
+  def execute(vm) do
+    {:ok, top_ds} = Stack.head(vm.ds)
+    {:ok, next_ds} = Stack.pop(vm.ds)
+
+    addr = top_ds
+
+    # length(vm.entries) |> IO.inspect(label: ">>>>>>>>>>>> execute ")
+
+    if addr < vm.entries do
+      # слово из core
+      {_word, {{m, f}, _immediate, _enable}} = :lists.nth(addr + 1, :lists.reverse(vm.entries))
+      next_vm = %E4vm{vm | ds: next_ds}
+
+      apply(m, f, [next_vm])
+    else
+      # интерпретируемое слово
+      %E4vm{vm | ds: next_ds}
+    end
   end
 end

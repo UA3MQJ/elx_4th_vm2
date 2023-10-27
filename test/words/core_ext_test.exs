@@ -195,6 +195,46 @@ defmodule E4vm.Words.CoreExtTest do
       assert vm.is_eval_mode == true
   end
 
+  test "immediate test" do
+    alias E4vm.CoreWord
+    Process.register(self(), :test_proc)
+
+    vm = E4vm.new()
+      |> E4vm.add_core_word("hello2", __MODULE__, :hello,   false)
+      |> E4vm.here_to_wp()
+
+    assert %CoreWord{word: "hello2", immediate: false} = hd(vm.core)
+
+    vm = vm
+      |> E4vm.add_op_from_string("doList")
+      |> E4vm.add_op_from_string("immediate")
+      |> E4vm.add_op_from_string("exit")
+      |> E4vm.Words.Core.do_list()
+      |> E4vm.Words.Core.next()
+
+    assert %CoreWord{word: "hello2", immediate: true} = hd(vm.core)
+  end
+
+  # обычное слово из core
+  test "execute1 test" do
+    Process.register(self(), :test_proc)
+
+    vm = E4vm.new()
+      |> E4vm.add_core_word("hello2", __MODULE__, :hello,   false)
+      |> E4vm.here_to_wp()
+      |> E4vm.add_op_from_string("doList")
+      |> E4vm.add_op_from_string("execute")
+      |> E4vm.add_op_from_string("exit")
+
+    vm
+      |> E4vm.Utils.ds_push(E4vm.look_up_word_address(vm, "hello2"))
+      # |> E4vm.inspect_core()
+      |> E4vm.Words.Core.do_list()
+      |> E4vm.Words.Core.next()
+
+    assert_receive :hello
+  end
+
   def hello(vm) do
     "ip:#{vm.ip} wp:#{vm.wp}" |> IO.inspect(label: ">>>>TEST>>>> hello  ")
 
