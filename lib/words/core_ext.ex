@@ -166,19 +166,8 @@ defmodule E4vm.Words.CoreExt do
     {:ok, top_ds} = Stack.head(vm.ds)
     {:ok, next_ds} = Stack.pop(vm.ds)
 
-    addr = top_ds
+    word_address = top_ds
 
-    # length(vm.entries) |> IO.inspect(label: ">>>>>>>>>>>> execute ")
-
-    if addr < vm.entries do
-      # слово из core
-      {_word, {{m, f}, _immediate, _enable}} = :lists.nth(addr + 1, :lists.reverse(vm.entries))
-      next_vm = %E4vm{vm | ds: next_ds}
-
-      apply(m, f, [next_vm])
-    else
-      # интерпретируемое слово
-      %E4vm{vm | ds: next_ds}
-    end
+    E4vm.execute(vm, word_address)
   end
 end

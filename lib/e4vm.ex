@@ -174,4 +174,20 @@ defmodule E4vm do
         end
     end
   end
+
+  # выполнить слово по указанному адресу
+  def execute(vm, word_address) when is_integer(word_address) do
+    case look_up_word_by_address(vm, word_address) do
+      # слова нет в core - значит оно интерпретируется
+      :undefined ->
+        # интерпретируемое слово
+        %E4vm{vm | ip: 0, wp: word_address}
+          |> E4vm.Words.Core.do_list()
+          |> E4vm.Words.Core.next()
+
+      core_word ->
+        # вызов слова из модуля
+        apply(core_word.module, core_word.function, [vm])
+    end
+  end
 end
