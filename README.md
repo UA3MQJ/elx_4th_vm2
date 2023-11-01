@@ -286,6 +286,8 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
   end
 ```
 
+1.7 eval(interpreter(interpreter_word()))
+
 2 Промежуточный итог.
 
 Ядро имеет `rs`, `ds`, `ip`, `wp`, память `mem`, хранилище примитивов `core`. Базовые операции `doList`, `next`, `exit` позволяют выполнять программу. Добавлены другие слова, которые не требуют ничего дополнительно от ядра, кроме свойства `cell_bit_size` - размер базовой ячейки, который нужен для формирования правильных констант boolean.
@@ -309,6 +311,16 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 Добавлено слово `execute` - выполнить слово по адресу со стека ds - стек данных. Если слово есть в `core` то исполняется, иначе интерпретируется благодаря `doList`.
 
 Готовы внутренние функции и возможности для `read_char` и `read_word` - можно двигаться дальше.
+
+Делаем интерпретатор. Зависимости:
+
+```
+eval(interpreter, read_char)
+interpreter(read_word, interpreter_word)
+read_word(do_read_word(read_char))
+interpreter_word(execute, is_constant, add_op, add_op_from_string)
+```
+Возможно, стоит сделать полное дерево зависимостей.
 
 
 # Поддежка слов

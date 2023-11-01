@@ -190,4 +190,15 @@ defmodule E4vm do
         apply(core_word.module, core_word.function, [vm])
     end
   end
+
+  # EVAL выполнить выражение в строке
+  def eval(%E4vm{} = vm, string) do
+    read_char_mfa = {E4vm, :read_string_char_function}
+    read_char_state = string
+
+    %E4vm{vm| read_char_mfa: read_char_mfa, read_char_state: read_char_state}
+      |> interpreter()
+  end
+
+  # EVAL выполнить выражение в строке
 end
