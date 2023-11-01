@@ -200,5 +200,17 @@ defmodule E4vm do
       |> interpreter()
   end
 
-  # EVAL выполнить выражение в строке
+  # читаем слова из буфера, пока они не кончились. и сполняем
+  def interpreter(%E4vm{} = vm) do
+    case read_word(vm) do
+      {vm, :end} ->
+        vm
+      {new_vm, word} ->
+        # IO.inspect(word, label: ">>>> interpreter word")
+        next_vm = interpreter_word(new_vm, word)
+        interpreter(next_vm) # interpreter next
+    end
+  end
+
+
 end
