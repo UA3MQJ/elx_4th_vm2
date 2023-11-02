@@ -69,16 +69,15 @@ defmodule E4vm.Words.MathTest do
     assert E4vm.Utils.ds_pop(vm) == 9
   end
 
-  # TODO отключено, пока eval не реализован
-  # test "test math" do
-  #   vm = E4vm.new()
-  #   assert vm |> E4vm.eval("10 2 -") |> E4vm.Utils.ds_pop() == 8
-  #   assert vm |> E4vm.eval("10 2 +") |> E4vm.Utils.ds_pop() == 12
-  #   assert vm |> E4vm.eval("10 2 *") |> E4vm.Utils.ds_pop() == 20
-  #   assert vm |> E4vm.eval("10 2 /") |> E4vm.Utils.ds_pop() == 5
-  #   assert vm |> E4vm.eval("10 2 mod") |> E4vm.Utils.ds_pop() == 0
-  #   assert vm |> E4vm.eval("10 1+") |> E4vm.Utils.ds_pop() == 11
-  #   assert vm |> E4vm.eval("10 1-") |> E4vm.Utils.ds_pop() == 9
-  # end
+  test "test math" do
+    vm = E4vm.new()
+    assert vm |> E4vm.eval("10 2 -") |> E4vm.Utils.ds_pop() == 8
+    assert vm |> E4vm.eval("10 2 +") |> E4vm.Utils.ds_pop() == 12
+    assert vm |> E4vm.eval("10 2 *") |> E4vm.Utils.ds_pop() == 20
+    assert vm |> E4vm.eval("10 2 /") |> E4vm.Utils.ds_pop() == 5
+    assert vm |> E4vm.eval("10 2 mod") |> E4vm.Utils.ds_pop() == 0
+    assert vm |> E4vm.eval("10 1+") |> E4vm.Utils.ds_pop() == 11
+    assert vm |> E4vm.eval("10 1-") |> E4vm.Utils.ds_pop() == 9
+  end
 
 end

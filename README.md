@@ -288,6 +288,13 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 1.7 eval(interpreter(interpreter_word()))
 
+После реализации `eval` начали работать тесты через `eval` для `math_test`, `comment_test`, 
+
+`mem_test` работает, но не проходит - надо реализовать слова.
+
+`rw_test` - то же самое.
+
+
 2 Промежуточный итог.
 
 Ядро имеет `rs`, `ds`, `ip`, `wp`, память `mem`, хранилище примитивов `core`. Базовые операции `doList`, `next`, `exit` позволяют выполнять программу. Добавлены другие слова, которые не требуют ничего дополнительно от ядра, кроме свойства `cell_bit_size` - размер базовой ячейки, который нужен для формирования правильных констант boolean.
@@ -329,7 +336,7 @@ interpreter_word(execute, is_constant, add_op, add_op_from_string)
 - [ ] Ext Core: `quit doLit here , branch 0branch dump words [ ] immediate execute` TODO: `: ; '`
 - [x] Mem: `! @ variable constant`
 - [x] Stack: `drop swap dup over rot nrot`
-- [x] Math: `- + * / mod 1+ 1-` TODO: тесты по eval
+- [x] Math: `- + * / mod 1+ 1-`
 - [x] Boolean: `true false and or xor not invert = <> < > <= >=`
-- [ ] Comment: `( \\`
+- [x] Comment: `( \\`
 - [ ] RW: `. .s cr bl word s" key`

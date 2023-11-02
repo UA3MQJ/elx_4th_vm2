@@ -212,5 +212,66 @@ defmodule E4vm do
     end
   end
 
+  # исполням слово
+  def interpreter_word(%E4vm{} = vm, word) do
+    word_addr = look_up_word_address(vm, word)
+    # IO.inspect(word_addr, label: ">>>> word_addr")
+
+    if vm.is_eval_mode do
+      # eval mode
+      cond do
+        # если это слово и оно определено - исполняем
+        word_addr != :undefined ->
+          execute(vm, word_addr)
+        # иначе, если это число - кладем на стек
+        is_constant(word) ->
+          integer = String.to_integer(word)
+          next_ds = Stack.push(vm.ds, integer)
+          %E4vm{vm | ds: next_ds}
+        # иначе, это ошибка - такого слова нет и это не константа
+        true ->
+          Logger.error "(1) The word #{word} is undefined"
+          %E4vm{vm| ds: Structure.Stack.new()}
+      end
+    else
+      # program mode
+      cond do
+        # если это слово
+        word_addr != :undefined ->
+          word_entry = look_up_word_by_string(vm, word)
+
+          if word_entry.immediate do
+            execute(vm, word_addr)
+          else
+            add_op(vm, word_addr)
+          end
+        # иначе, если это число
+        is_constant(word) ->
+          # пишем в память dolit число
+          vm
+            |> add_op_from_string("doLit")
+            |> add_op(String.to_integer(word))
+        # иначе, это ошибка - такого слова нет и это не константа
+        true ->
+          Logger.error "(2) The word #{word} is undefined"
+          %E4vm{vm| ds: Structure.Stack.new(), is_eval_mode: true}
+      end
+    end
+  end
+
+  def is_constant(string) do
+    cond do
+      is_digit(String.slice(string, 0..0)) ->
+        true
+      (String.length(string) >= 2) and (String.slice(string, 0..0) in ["+", "-"]) and (is_digit(String.slice(string, 1..1))) ->
+        true
+      true ->
+        false
+    end
+  end
+
+  def is_digit(char) do
+    char in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  end
 
 end
