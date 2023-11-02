@@ -294,6 +294,8 @@ Boolean: `true false and or xor not invert = <> < > <= >=`
 
 `rw_test` - то же самое.
 
+1.8
+
 
 2 Промежуточный итог.
 

@@ -36,6 +36,7 @@ defmodule E4vm do
       |> E4vm.Words.Math.add_core_words()
       |> E4vm.Words.Boolean.add_core_words()
       |> E4vm.Words.Comment.add_core_words()
+      |> E4vm.Words.Mem.add_core_words()
   end
 
   def do_list(vm), do: E4vm.Words.Core.do_list(vm)
@@ -272,6 +273,15 @@ defmodule E4vm do
 
   def is_digit(char) do
     char in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
+  end
+
+  def add_header(%E4vm{} = vm, word) do
+    vm |> E4vm.define(word, vm.hereP)
+  end
+
+  def define(%E4vm{} = vm, word, entry, immediate \\ false) do
+    entry = {word, {entry, immediate, true}}
+    %E4vm{vm| entries: [entry] ++ vm.entries}
   end
 
 end
