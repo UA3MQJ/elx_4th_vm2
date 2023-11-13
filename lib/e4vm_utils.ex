@@ -55,10 +55,11 @@ defmodule E4vm.Utils do
     |> Map.keys()
     |> Enum.sort()
     |> Enum.map(fn(k) ->
-      "#{k}:#{vm.mem[k]} (#{inspect vm.core[vm.mem[k]]})" |> IO.puts()
+      # "#{k}:#{vm.mem[k]} (#{inspect vm.core[vm.mem[k]]})" |> IO.puts()
+      "#{k}:#{vm.mem[k]} " |> IO.puts()
     end)
 
-    vm.core |> IO.inspect(label: "core")
+    # vm.core |> IO.inspect(label: "core")
 
     vm
   end

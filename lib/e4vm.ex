@@ -2,6 +2,12 @@ defmodule E4vm do
   defmodule CoreWord do
     defstruct [:word, :module, :function, :address, :immediate, :enabled]
   end
+  defmodule Constant do
+    defstruct [:word, :address]
+  end
+  defmodule Variable do
+    defstruct [:word, :address]
+  end
   @moduledoc """
   Documentation for `E4vm`.
   ds word size - 16 bit
@@ -9,6 +15,8 @@ defmodule E4vm do
   require Logger
   alias Structure.Stack
   alias E4vm.CoreWord
+  alias E4vm.Constant
+  alias E4vm.Variable
 
   @alu_bit_width 16
 
@@ -187,8 +195,42 @@ defmodule E4vm do
           |> E4vm.Words.Core.next()
 
       core_word ->
-        # вызов слова из модуля
-        apply(core_word.module, core_word.function, [vm])
+        core_word |> IO.inspect(label: ">>>> core_word")
+
+        case core_word do
+          # переменная и константа тоже интерпретируются
+          %Constant{} = core_word ->
+            # интерпретируемое слово
+            %E4vm{vm | ip: 0, wp: word_address}
+              |> E4vm.Words.Core.do_list()
+              |> E4vm.Words.Core.next()
+          %Variable{} = core_word ->
+            # интерпретируемое слово
+            %E4vm{vm | ip: 0, wp: word_address}
+              |> E4vm.Words.Core.do_list()
+              |> E4vm.Words.Core.next()
+
+          # а слово ядра - исполняется
+          %CoreWord{} = core_word ->
+            # apply(core_word.module, core_word.function, [vm])
+            if is_nil(core_word.module) do
+              # интерпретируемое слово
+              %E4vm{vm | ip: 0, wp: word_address}
+                |> E4vm.Words.Core.do_list()
+                |> E4vm.Words.Core.next()
+            else
+              apply(core_word.module, core_word.function, [vm])
+            end
+        end
+        # # вызов слова из модуля
+        # if is_nil(core_word.module) do
+        #   # интерпретируемое слово (const или variable)
+        #   %E4vm{vm | ip: 0, wp: word_address}
+        #     |> E4vm.Words.Core.do_list()
+        #     |> E4vm.Words.Core.next()
+        # else
+        #   apply(core_word.module, core_word.function, [vm])
+        # end
     end
   end
 
@@ -216,7 +258,6 @@ defmodule E4vm do
   # исполням слово
   def interpreter_word(%E4vm{} = vm, word) do
     word_addr = look_up_word_address(vm, word)
-    # IO.inspect(word_addr, label: ">>>> word_addr")
 
     if vm.is_eval_mode do
       # eval mode
@@ -276,12 +317,67 @@ defmodule E4vm do
   end
 
   def add_header(%E4vm{} = vm, word) do
-    vm |> E4vm.define(word, vm.hereP)
+    E4vm.add_core_word(vm, word, nil, nil, false)
   end
 
-  def define(%E4vm{} = vm, word, entry, immediate \\ false) do
-    entry = {word, {entry, immediate, true}}
-    %E4vm{vm| entries: [entry] ++ vm.entries}
+  def add_constant(%E4vm{} = vm, word) do
+    # E4vm.add_core_word(vm, word, nil, nil, false)
+
+    # word_address = vm.hereP
+    # core_word = %Constant{
+    #   word: word,
+    #   address: word_address
+    # }
+
+    # vm
+    # |> Map.merge(%{core: [core_word] ++ vm.core})
+    # |> add_address_to_mem(word_address)
+    # |> inc_here() # hereP++
+
+    word_address = vm.hereP
+    core_word = %CoreWord{
+      word: word,
+      module: nil,
+      function: nil,
+      address: word_address,
+      immediate: false,
+      enabled: true # by default
+    }
+
+    vm
+    |> Map.merge(%{core: [core_word] ++ vm.core})
+    |> add_address_to_mem(word_address)
+    |> inc_here() # hereP++
+  end
+
+  def add_variable(%E4vm{} = vm, word) do
+    # E4vm.add_core_word(vm, word, nil, nil, false)
+
+    # word_address = vm.hereP
+    # core_word = %Variable{
+    #   word: word,
+    #   address: word_address
+    # }
+
+    # vm
+    # |> Map.merge(%{core: [core_word] ++ vm.core})
+    # |> add_address_to_mem(word_address)
+    # |> inc_here() # hereP++
+
+    word_address = vm.hereP
+    core_word = %CoreWord{
+      word: word,
+      module: nil,
+      function: nil,
+      address: word_address,
+      immediate: false,
+      enabled: true # by default
+    }
+
+    vm
+    |> Map.merge(%{core: [core_word] ++ vm.core})
+    |> add_address_to_mem(word_address)
+    |> inc_here() # hereP++
   end
 
 end

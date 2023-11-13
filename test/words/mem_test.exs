@@ -12,7 +12,7 @@ defmodule E4vm.Words.MemTest do
       |> E4vm.Utils.ds_push(555)
       |> E4vm.do_list()
       |> E4vm.next()
-      # |> E4vm.inspect_core()
+      # |> E4vm.Utils.inspect_core()
 
     # в памяти по адресу 555 должна быть записана 1
     assert vm.mem[555] == 1
@@ -56,7 +56,7 @@ defmodule E4vm.Words.MemTest do
     vm = E4vm.new()
       |> E4vm.eval("123 constant X123") # определили константу
       |> E4vm.eval("X123") # должна в стек положить 123
-      # |> E4vm.inspect_core()
+      # |> E4vm.Utils.inspect_core()
 
       # в стеке должно быть значение константы 123
       assert Stack.size(vm.ds) == 1
