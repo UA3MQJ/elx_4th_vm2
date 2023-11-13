@@ -105,6 +105,8 @@ defmodule E4vm do
   def look_up_word_address(vm, word_string) do
     case look_up_word_by_string(vm, word_string) do
       %CoreWord{address: address} -> address
+      %Constant{address: address} -> address
+      %Variable{address: address} -> address
       _else -> :undefined
     end
   end
@@ -114,6 +116,8 @@ defmodule E4vm do
     result = Enum.find(core, fn word -> word.word == word_string end)
     case result do
       %CoreWord{} = core_word -> core_word
+      %Constant{} = const_word -> const_word
+      %Variable{} = var_word -> var_word
       _else -> :undefined
     end
   end
@@ -123,6 +127,8 @@ defmodule E4vm do
     result = Enum.find(core, fn word -> word.address == word_address end)
     case result do
       %CoreWord{} = core_word -> core_word
+      %Constant{} = const_word -> const_word
+      %Variable{} = var_word -> var_word
       _else -> :undefined
     end
   end
@@ -195,8 +201,6 @@ defmodule E4vm do
           |> E4vm.Words.Core.next()
 
       core_word ->
-        core_word |> IO.inspect(label: ">>>> core_word")
-
         case core_word do
           # переменная и константа тоже интерпретируются
           %Constant{} = core_word ->
@@ -316,6 +320,7 @@ defmodule E4vm do
     char in ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
   end
 
+  # deprecated
   def add_header(%E4vm{} = vm, word) do
     E4vm.add_core_word(vm, word, nil, nil, false)
   end
@@ -323,25 +328,10 @@ defmodule E4vm do
   def add_constant(%E4vm{} = vm, word) do
     # E4vm.add_core_word(vm, word, nil, nil, false)
 
-    # word_address = vm.hereP
-    # core_word = %Constant{
-    #   word: word,
-    #   address: word_address
-    # }
-
-    # vm
-    # |> Map.merge(%{core: [core_word] ++ vm.core})
-    # |> add_address_to_mem(word_address)
-    # |> inc_here() # hereP++
-
     word_address = vm.hereP
-    core_word = %CoreWord{
+    core_word = %Constant{
       word: word,
-      module: nil,
-      function: nil,
-      address: word_address,
-      immediate: false,
-      enabled: true # by default
+      address: word_address
     }
 
     vm
@@ -353,25 +343,10 @@ defmodule E4vm do
   def add_variable(%E4vm{} = vm, word) do
     # E4vm.add_core_word(vm, word, nil, nil, false)
 
-    # word_address = vm.hereP
-    # core_word = %Variable{
-    #   word: word,
-    #   address: word_address
-    # }
-
-    # vm
-    # |> Map.merge(%{core: [core_word] ++ vm.core})
-    # |> add_address_to_mem(word_address)
-    # |> inc_here() # hereP++
-
     word_address = vm.hereP
-    core_word = %CoreWord{
+    core_word = %Variable{
       word: word,
-      module: nil,
-      function: nil,
-      address: word_address,
-      immediate: false,
-      enabled: true # by default
+      address: word_address
     }
 
     vm

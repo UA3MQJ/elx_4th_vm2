@@ -51,7 +51,6 @@ defmodule E4vm.Words.Mem do
       {new_vm, word} ->
         # IO.inspect(word, label: ">>>> variable word")
         %E4vm{new_vm | mem: Map.merge(new_vm.mem, %{here => nil})} # инициирую адрес. но пустым значением
-          # |> E4vm.add_header(word)  # <- add_header должен стоять первым!
           |> E4vm.add_variable(word)  # <- должен стоять первым!
           |> E4vm.add_op_from_string("doList")
           |> E4vm.add_op_from_string("doLit")
@@ -74,7 +73,6 @@ defmodule E4vm.Words.Mem do
         {:ok, next_ds} = Stack.pop(new_vm.ds)
 
         %E4vm{new_vm | ds: next_ds}
-          # |> E4vm.add_header(word)  # <- add_header должен стоять первым!
           |> E4vm.add_constant(word)  # <- должен стоять первым!
           |> E4vm.add_op_from_string("doList")
           |> E4vm.add_op_from_string("doLit")
